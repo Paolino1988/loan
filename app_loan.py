@@ -35,14 +35,14 @@ def amount_1(X, q, r):
 def amount_2(X, list_months, r):
     list_am2 = []
 
-    Q = X 
-    n = 1
-
+    Q = X*(1+r)
+    
     for n in list_months:
   
       list_am2.append(-Q * (1 + r)**(n-1))
-
-    return list_am2
+    
+    list_am2.append(-Q * (1 + r)**(n))
+    return list_am2, list_am2[-1]/(1+0.01/12)**list_months[-1]
 
 
 # ------------------------
