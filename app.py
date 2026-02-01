@@ -38,7 +38,7 @@ def amount_2(X, list_months, r):
     Q = X 
     n = 1
 
-    for n in range(list_months):
+    for n in list_months:
   
       list_am2.append(-Q * (1 + r)**(n-1))
 
@@ -54,7 +54,6 @@ def amount_2(X, list_months, r):
 # ------------------------
 
 app = dash.Dash(__name__)
-
 app.title = "Andamento Rata/Debito"
 server = app.server 
 
@@ -150,4 +149,8 @@ def update_graph(a, b, c):
 
 
 if __name__ == '__main__':
-	app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
+    app.run_server(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 8050)),
+        debug=True
+    )
