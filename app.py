@@ -1,6 +1,6 @@
 import numpy as np
 import dash
-from dash import dcc, html
+from dash import Dash, dash_table, dcc, html
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 
@@ -52,7 +52,10 @@ def amount_2(X, list_months, r):
 
 # App Dash
 # ------------------------
-app = dash.Dash(__name__)
+
+app = Dash(__name__, suppress_callback_exceptions=True)
+app.title = "Andamento Rata/Debito"
+server = app.server 
 
 app.layout = html.Div(
     style={"width": "80%", "margin": "auto"},
