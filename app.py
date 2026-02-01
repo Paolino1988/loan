@@ -53,7 +53,8 @@ def amount_2(X, list_months, r):
 # App Dash
 # ------------------------
 
-app = Dash(__name__, suppress_callback_exceptions=True)
+app = dash.Dash(__name__)
+
 app.title = "Andamento Rata/Debito"
 server = app.server 
 
