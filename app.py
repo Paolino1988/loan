@@ -1,0 +1,149 @@
+import numpy as np
+import dash
+from dash import dcc, html
+from dash.dependencies import Input, Output
+import plotly.graph_objects as go
+
+# ------------------------
+# Funzione di calcolo
+# ------------------------
+def amount_1(X, q, r):
+    list_am1 = []
+    list_months = []
+    s = 0
+    Q = X * (1 + r)
+    n = 1
+
+    while Q >= q:
+        Q = (Q - q) * (1 + r)
+        n += 1
+        list_months.append(n)
+        s += q
+        list_am1.append(s)
+
+    list_am1.append(s + Q * (1 + r))
+    list_months.append(n + 1)
+
+    return list_am1, list_months
+
+
+# ------------------------
+
+# ------------------------
+# Funzione di calcolo
+# ------------------------
+def amount_2(X, list_months, r):
+    list_am2 = []
+
+    Q = X 
+    n = 1
+
+    for n in range(list_months):
+  
+      list_am2.append(-Q * (1 + r)**(n-1))
+
+    return list_am2
+
+
+# ------------------------
+
+
+
+
+# App Dash
+# ------------------------
+app = dash.Dash(__name__)
+
+app.layout = html.Div(
+    style={"width": "80%", "margin": "auto"},
+    children=[
+
+        html.H2("Dashboard Dash – Plot dinamico"),
+
+        html.Label("Tasso annuo (%)"),
+        dcc.Slider(
+            id="a-slider",
+            min=0.5,
+            max=5,
+            step=0.5,
+            value=2,
+            marks={i: f"{i}%" for i in range(1, 6)}
+        ),
+
+        html.Br(),
+
+        html.Label("Rata"),
+        dcc.Slider(
+            id="b-slider",
+            min=0,
+            max=1000,
+            step=50,
+            value=150,
+            marks={i: str(i) for i in range(0, 1001, 200)}
+        ),
+
+        html.Br(),
+
+        html.Label("Capitale iniziale"),
+        dcc.Slider(
+            id="c-slider",
+            min=1000,
+            max=10000,
+            step=500,
+            value=8000,
+            marks={i: str(i) for i in range(1000, 10001, 2000)}
+        ),
+
+        dcc.Graph(id="main-graph")
+    ]
+)
+
+# ------------------------
+# Callback
+# ------------------------
+@app.callback(
+    Output("main-graph", "figure"),
+    Input("a-slider", "value"),
+    Input("b-slider", "value"),
+    Input("c-slider", "value")
+)
+def update_graph(a, b, c):
+
+    list_amount, list_months = amount_1(c, b, a / 1200)
+    list_amount_1 = amount_2(c, list_months, a / 1200)
+  
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=list_months,
+            y=list_amount,
+            mode="lines+markers",
+            marker=dict(size=8),
+            name="Capitale cumulato"
+        )
+    )
+
+
+    fig.add_trace(
+        go.Scatter(
+            x=list_months,
+            y=list_amount_1,
+            mode="lines+markers",
+            marker=dict(size=8),
+            name="Debito cumulato"
+        )
+    )
+
+    fig.update_layout(
+        title="Rata vs Debito cumulato a parità di periodo",
+        xaxis_title="Mesi",
+        yaxis_title="Importo cumulato",
+        template="plotly_white",
+        height=500
+    )
+
+    return fig
+
+
+if __name__ == '__main__':
+	app.run_server(host="0.0.0.0", port=int(os.environ.get("PORT", 8050)))
