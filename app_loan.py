@@ -10,18 +10,20 @@ import plotly.graph_objects as go
 def amount_1(X, q, r):
     list_am1 = []
     list_months = []
-    s = 0
-    Q = X * (1 + r)
+    s = -q
+    Q = X * (1 + r)-q
     n = 1
+    list_months.append(n)
+    list_am1.append(s)
 
     while Q >= q:
         Q = (Q - q) * (1 + r)
         n += 1
         list_months.append(n)
-        s += q
+        s += -q
         list_am1.append(s)
 
-    list_am1.append(s + Q * (1 + r))
+    list_am1.append(s - Q * (1 + r))
     list_months.append(n + 1)
 
     return list_am1, list_months
@@ -35,13 +37,12 @@ def amount_1(X, q, r):
 def amount_2(X, list_months, r,d):
     list_am2 = []
 
-    Q = X*(1+r)
+    Q = X
     
     for n in list_months:
   
-      list_am2.append(-Q * (1 + r)**(n-1))
-    
-    list_am2.append(-Q * (1 + r)**(n))
+      list_am2.append(-Q * (1 + r)**(n))
+  
     return list_am2, list_am2[-1]/(1+d/12)**list_months[-1]
 
 
