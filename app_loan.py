@@ -61,7 +61,7 @@ app.layout = html.Div(
     style={"width": "80%", "margin": "auto"},
     children=[
 
-        html.H2("Dashboard Dash – Plot dinamico"),
+        html.H2("Dashboard Dash – Plot dinamici"),
 
         html.Label("Tasso annuo (%)"),
         dcc.Slider(
@@ -138,7 +138,7 @@ def update_graph(a, b, c):
     )
 
     fig.update_layout(
-        title="Rata vs Debito cumulato a parità di periodo",
+        title="Rata vs Scoperto cumulato a parità di periodo",
         xaxis_title="Mesi",
         yaxis_title="Importo cumulato",
         template="plotly_white",
