@@ -32,7 +32,7 @@ def amount_1(X, q, r):
 # ------------------------
 # Funzione di calcolo
 # ------------------------
-def amount_2(X, list_months, r):
+def amount_2(X, list_months, r,d):
     list_am2 = []
 
     Q = X*(1+r)
@@ -42,7 +42,7 @@ def amount_2(X, list_months, r):
       list_am2.append(-Q * (1 + r)**(n-1))
     
     list_am2.append(-Q * (1 + r)**(n))
-    return list_am2, list_am2[-1]/(1+0.01/12)**list_months[-1]
+    return list_am2, list_am2[-1]/(1+d/12)**list_months[-1]
 
 
 # ------------------------
@@ -97,6 +97,19 @@ app.layout = html.Div(
             marks={i: str(i) for i in range(1000, 10001, 2000)}
         ),
 
+        html.Br(),
+
+        html.Label("Tasso di inflazione"),
+        dcc.Slider(
+           id="d-slider",
+            min=0.5,
+            max=3,
+            step=0.5,
+            value=1,
+            marks={i: f"{i}%" for i in range(1, 6)}
+        ),
+
+
         dcc.Graph(id="main-graph")
     ]
 )
@@ -108,12 +121,14 @@ app.layout = html.Div(
     Output("main-graph", "figure"),
     Input("a-slider", "value"),
     Input("b-slider", "value"),
-    Input("c-slider", "value")
+    Input("c-slider", "value"),
+    Input("d-slider", "value")
 )
-def update_graph(a, b, c):
+def update_graph(a, b, c,d):
 
     list_amount, list_months = amount_1(c, b, a / 1200)
-    list_amount_1 = amount_2(c, list_months, a / 1200)
+    list_amount_1 = amount_2(c, list_months, a / 1200,d)[0]
+    point_infl = amount_2(c, list_months, a / 1200,d / 100)[1]
   
     fig = go.Figure()
     fig.add_trace(
