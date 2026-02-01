@@ -1,0 +1,6 @@
+pandas
+dash==2.14.1
+dash-bootstrap-components
+matplotlib
+gunicorn==21.2.0
+plotly
