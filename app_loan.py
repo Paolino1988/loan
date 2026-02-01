@@ -138,7 +138,7 @@ def update_graph(a, b, c,d):
             y=list_amount,
             mode="lines+markers",
             marker=dict(size=8),
-            name="Capitale + interessi cumulato"
+            name="Uscite cumulate con rate"
         )
     )
 
@@ -164,7 +164,7 @@ def update_graph(a, b, c,d):
                 color="red",           
                 symbol="x"             
         ),
-            name="Debito cumulato finale con potere di acquisto (inflazione)"
+            name="Debito cumulato finale con inflazione"
         )
     )
 
