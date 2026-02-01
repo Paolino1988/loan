@@ -99,7 +99,7 @@ app.layout = html.Div(
 
         html.Br(),
 
-        html.Label("Tasso di inflazione"),
+        html.Label("Tasso di inflazione per valutare debito rispetto potere di acquisto"),
         dcc.Slider(
            id="d-slider",
             min=0.5,
