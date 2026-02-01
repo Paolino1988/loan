@@ -127,7 +127,7 @@ app.layout = html.Div(
 def update_graph(a, b, c,d):
 
     list_amount, list_months = amount_1(c, b, a / 1200)
-    list_amount_1 = amount_2(c, list_months, a / 1200,d)[0]
+    list_amount_1 = amount_2(c, list_months, a / 1200,d / 100)[0]
     point_infl = amount_2(c, list_months, a / 1200,d / 100)[1]
   
     fig = go.Figure()
@@ -155,8 +155,8 @@ def update_graph(a, b, c,d):
 
     fig.add_trace(
         go.Scatter(
-            x=list_months[-1],
-            y=point_infl,
+            x=[list_months[-1]],
+            y=[point_infl],
             mode="markers",           
             marker=dict(
                 size=12,              
