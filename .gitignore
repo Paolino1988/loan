@@ -1,0 +1,33 @@
+# Cartelle e file Python
+__pycache__/
+*.py[cod]
+*.so
+
+# Ambiente virtuale
+venv/
+.env
+*.env
+
+# File di log e cache
+*.log
+logs/
+cache/
+
+# Configurazioni IDE/editor
+.vscode/
+*.swp
+*.swo
+.idea/
+
+# File temporanei
+.DS_Store
+*.bak
+*.tmp
+*.backup
+
+# Librerie installate (solo se non usi requirements.txt)
+site-packages/
+
+# Cartelle di build
+dist/
+build/
