@@ -99,7 +99,7 @@ app.title = "Andamento Rata/Debito"
 server = app.server 
 
 app.layout = html.Div(
-    style={"width": "80%", "margin": "auto"},
+    style={"width": "80%", "margin": "auto", "padding": "24px", "backgroundColor": "#0f172a"},
     children=[
 
         html.H2("Dashboard Dash – Plot dinamici"),
@@ -192,7 +192,7 @@ app.layout = html.Div(
 
 
       dcc.Graph(id = "summary-box") 
-    ],style={"padding": "24px", "backgroundColor": "#0f172a"}
+    ]
 )
 
 # ------------------------
