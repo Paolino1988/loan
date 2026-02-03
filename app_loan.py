@@ -215,8 +215,8 @@ def update_graph(a, b, c,d,e,f,g):
     list_amount_1 = amount_2(c, list_months, a / 1200, d / 100)[0]
     point_infl = amount_2(c, list_months, a / 1200, d / 100)[1]
     
-    list_amount_2, point_infl1 = amount_3(b, list_months, a/1200, e/1200 )
-    list_amount_4, point_infl2 = amount_4(b, f, list_months, a/1200, g/1200, e / 100)
+    list_amount_2, point_infl1 = amount_3(b, list_months, a/1200, d/100 )
+    list_amount_4, point_infl2 = amount_4(b, f, list_months, a/1200, g/1200, d / 100)
 
 
     
