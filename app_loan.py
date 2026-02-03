@@ -185,7 +185,7 @@ app.layout = html.Div(
             max=2,
             step=0.5,
             value=1,
-            marks={i: f"{i}%" for i in range(1, 2)}
+            marks={i: f"{i}%" for i in [0.5, 1, 1.5, 2]}
         ),
 
 
