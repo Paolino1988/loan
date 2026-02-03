@@ -166,52 +166,65 @@ def update_graph(a, b, c,d):
     
     list_amount_2 = amount_3(b, list_months, e/1200)
   
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=list_months,
-            y=list_amount,
-            mode="lines+markers",
-            marker=dict(size=8),
-            name="Uscite cumulate con rate"
-        )
+fig = go.Figure()
+fig.add_trace(
+    go.Scatter(
+        x=list_months,
+        y=list_amount,
+        mode="lines+markers",
+        marker=dict(size=8),
+        name="Accumulo rate"
     )
+)
 
 
-    fig.add_trace(
-        go.Scatter(
-            x=list_months,
-            y=list_amount_1,
-            mode="lines+markers",
-            marker=dict(size=8),
-            name="Debito cumulato"
-        )
+fig.add_trace(
+    go.Scatter(
+        x=list_months,
+        y=list_amount_1,
+        mode="lines+markers",
+        marker=dict(size=8),
+        name="Debito cumulato"
     )
+)
 
 
-    fig.add_trace(
-        go.Scatter(
-            x=[list_months[-1]],
-            y=[point_infl],
-            mode="markers",           
-            marker=dict(
-                size=12,              
-                color="red",           
-                symbol="x"             
-        ),
-            name="Debito cumulato finale con inflazione"
-        )
+fig.add_trace(
+    go.Scatter(
+        x=[list_months[-1]],
+        y=[point_infl],
+        mode="markers",
+        marker=dict(
+            size=10,
+            color="red",
+            symbol="x"
+    ),
+        name="Debito cumulato finale con inflazione"
     )
+)
 
-    fig.update_layout(
-        title="Rata vs Scoperto cumulato a parità di periodo",
-        xaxis_title="Mesi",
-        yaxis_title="Importo cumulato",
-        template="plotly_white",
-        height=500
+
+
+fig.add_trace(
+    go.Scatter(
+        x=list_months,
+        y=list_amount_2,
+        mode="lines+markers",
+        marker=dict(size=8),
+        name="capitale cumulato con renumerazione"
     )
+)
 
-    return fig
+
+
+
+fig.update_layout(
+    title="Rata vs Scoperto cumulato a parità di periodo",
+    xaxis_title="Mesi",
+    yaxis_title="Importo",
+    template="plotly_white",
+    height=500
+)
 
 
 if __name__ == '__main__':
