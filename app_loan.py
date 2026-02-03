@@ -204,6 +204,7 @@ app.layout = html.Div(
     Input("b-slider", "value"),
     Input("c-slider", "value"),
     Input("d-slider", "value"),
+    Input("e-slider", "value"),
     Input("f-slider", "value"),
     Input("g-slider", "value")
 )
@@ -216,7 +217,7 @@ def update_graph(a, b, c,d,e,f,g):
     
     list_amount_2, point_infl1 = amount_3(b, list_months, a/1200, e/1200 )
     list_amount_4, point_infl2 = amount_4(b, f, list_months, a/1200, g/1200, e / 100)
-  
+
 
     
     
