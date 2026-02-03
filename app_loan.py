@@ -53,21 +53,41 @@ def amount_2(X, list_months, r,d):
 # ------------------------
 
 
-def amount_3(q,list_months, r):
+def amount_3(q,list_months, r,d):
     list_am2 = []
 
-    Q = q*(1+r)
-    list_am2.append(Q)
+    Q = 0
 
     for n in list_months:
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
 
-    return list_am2
+    return list_am2, list_am2[-1]/(1+d/12)**list_months[-1]
 
 
 # ------------------------
 
+
+
+
+def amount_4(q,m,list_months, r,dr,r_min,d):
+    list_am2 = []
+
+    Q = 0
+    ii=0
+    for n in list_months:
+      if n % m==0 and r>dr:
+        r=r-dr
+      elif r<=dr:
+        r=r_min
+      
+      Q = (Q+q)*(1+r)
+      list_am2.append(Q)
+
+    return list_am2, list_am2[-1]/(1+d/12)**list_months[-1]
+
+
+# ------------------------
 
 
 
@@ -84,7 +104,7 @@ app.layout = html.Div(
 
         html.H2("Dashboard Dash – Plot dinamici"),
 
-        html.Label("Tasso annuo (%)"),
+        html.Label("Tasso annuo debito (%)"),
         dcc.Slider(
             id="a-slider",
             min=0.5,
@@ -143,93 +163,121 @@ app.layout = html.Div(
         ),
 
 
-        dcc.Graph(id="main-graph")
-    ]
+        html.Br(),
+
+        html.Label("Numero di mesi di rotazione del tasso di renumerazione"),
+        dcc.Slider(
+            id="f-slider",
+            min=3,
+            max=12,
+            step=3,
+            value=3,
+            marks={i: str(i) for i in range(2, 12, 3)}
+        ),
+        
+        
+        html.Br(),
+
+        html.Label("Percentuale di sottrazione del tasso di renumerazione rispetto al periodo di rotazione"),
+        dcc.Slider(
+           id="g-slider",
+            min=0.5,
+            max=2,
+            step=0.5,
+            value=1,
+            marks={i: f"{i}%" for i in range(1, 2)}
+        ),
+
+
+
+
+      dcc.Graph(id = "summary-box") 
+    ],style={"padding": "24px", "backgroundColor": "#0f172a"}
 )
 
 # ------------------------
 # Callback
 # ------------------------
 @app.callback(
-    Output("main-graph", "figure"),
+    Output("summary-box", "figure"),
     Input("a-slider", "value"),
     Input("b-slider", "value"),
     Input("c-slider", "value"),
     Input("d-slider", "value"),
     Input("e-slider", "value")
 )
-def update_graph(a, b, c,d,e):
+def update_graph(a, b, c,d,e,f,g):
 
     list_amount = amount_1(c, b, a / 1200)[0]
     list_months = amount_1(c, b, a / 1200)[1]
-    list_amount_1 = amount_2(c, list_months, a / 1200,1 / 100)[0]
-    point_infl = amount_2(c, list_months, a / 1200,d / 100)[1]
+    list_amount_1 = amount_2(c, list_months, a / 1200, d / 100)[0]
+    point_infl = amount_2(c, list_months, a / 1200, d / 100)[1]
     
-    list_amount_2 = amount_3(b, list_months, e/1200)
+    list_amount_2, point_infl1 = amount_3(b, list_months, a/1200, e/1200 )
+    list_amount_4, point_infl2 = amount_4(b, f, list_months, a/1200, g/1200, e / 100)
   
+
+    
+    
+    final_accumulo_rate = list_amount[-1] if list_amount else None
+    final_debito_cumulato = list_amount_1[-1] if list_amount_1 else None
+    final_debito_cumulato_infl = point_infl
+    final_capitale_cumulato = list_amount_2[-1] if list_amount_2 else None
+    final_capitale_cumulato_var = list_amount_4[-1] if list_amount_4 else None
+    
+    
+    
+    def format_currency(x, symbol="€"):
+        # formattazione compatta: separatore migliaia, zero decimali
+        try:
+            return f"{symbol} {x:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except Exception:
+            return f"{symbol} {x}"
+    
+    
+    def fmt(x): return format_currency(x)
+    
+    text = (
+          f"<b>Riepilogo</b><br><br>"
+          f"<span style='color:	#adff2f'>Numero di Mesi per estinzione rispetto alla Rata fissata di {fmt(200)}</span>: <b>{list_months[-1]}</b><br>"
+          f"<span style='color:#60a5fa'>Accumulo rate mensili per estinzione</span>: <b>{fmt(final_accumulo_rate)}</b><br>"
+          f"<span style='color:#ef4444'>Debito cumulato senza rate nello stesso periodo</span>: <b>{fmt(final_debito_cumulato)}</b><br>"
+          f"<span style='color:#ef4444'>Debito cumulato normalizzato per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(final_debito_cumulato_infl)}</b><br>"
+          f"<span style='color:#34d399'>Capitale cumulato valutando un PAC pari alla rata di {fmt(200)} con remunerazione fissa del 3% </span>: <b>{fmt(final_capitale_cumulato)}</b><br>"
+          f"<span style='color:#34d399'>_____ per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(point_infl1)}</b><br>"
+          f"<span style='color:#ffd700'>Capitale cumulato valutando un PAC pari alla rata di {fmt(200)} con remunerazione fissa del 3% variabile ogni 6 mesi diminuito del 1% </span>: <b>{fmt(final_capitale_cumulato_var)}</b><br>"
+          f"<span style='color:#ffd700'>_____ per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(point_infl2)}</b>"
+     
+     )
+    
     fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=list_months,
-            y=list_amount,
-            mode="lines+markers",
-            marker=dict(size=8),
-            name="Accumulo rate"
-        )
-    )
-    
-    
-    fig.add_trace(
-        go.Scatter(
-            x=list_months,
-            y=list_amount_1,
-            mode="lines+markers",
-            marker=dict(size=8),
-            name="Debito cumulato"
-        )
-    )
-    
-    
-    fig.add_trace(
-        go.Scatter(
-            x=[list_months[-1]],
-            y=[point_infl],
-            mode="markers",
-            marker=dict(
-                size=10,
-                color="red",
-                symbol="x"
-        ),
-            name="Debito cumulato finale con inflazione"
-        )
-    )
-    
-    
-    
-    fig.add_trace(
-        go.Scatter(
-            x=list_months,
-            y=list_amount_2,
-            mode="lines+markers",
-            marker=dict(size=8),
-            name="capitale cumulato con renumerazione"
-        )
-    )
-    
-    
-    
-    
+    # nasconde assi e griglia, sfondo scuro elegante
     fig.update_layout(
-        title="Rata vs Scoperto cumulato a parità di periodo",
-        xaxis_title="Mesi",
-        yaxis_title="Importo",
         template="plotly_white",
-        height=500
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        plot_bgcolor="#0f172a",
+        paper_bgcolor="#0f172a",
+        margin=dict(l=40, r=40, t=60, b=40),
+        title=dict(text="Scheda", x=0.5, xanchor="center", font=dict(color="#f1f5f9", size=22)),
     )
+    
+    fig.add_annotation(
+        x=0.5, y=0.5, xref="paper", yref="paper",
+        text=text,
+        showarrow=False,
+        font=dict(size=18, color="#e5e7eb"),
+        align="left",
+        bordercolor="#1f2937",
+        borderwidth=1,
+        borderpad=12,
+        bgcolor="#111827",
+        opacity=0.98,
+    )
+
+
 
     return fig
-
-
 
 
 
