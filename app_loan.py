@@ -252,30 +252,86 @@ def update_graph(a, b, c,d,e,f,g):
      
      )
     
+   
+   
+    def wrap_html(html_text, max_px=780, align="left"):
+        """
+        Incapsula il testo HTML in un contenitore con larghezza massima e wrapping.
+        align: 'left' | 'center'
+        """
+        text_align = "left" if align not in ("left", "center") else align
+        return (
+            f"<div style='"
+            f"max-width:{max_px}px;"
+            f"white-space:normal;"
+            f"line-height:1.35;"
+            f"text-align:{text_align};"
+            f"'>"
+            f"{html_text}"
+            f"</div>"
+        )
+    
+    # ... dentro update_graph, dopo aver costruito la variabile `text` ...
+    
+    # 1) Wrapping del testo con contenitore a larghezza controllata
+    wrapped_text = wrap_html(text, max_px=820, align="left")
+    
+    # 2) Figura “canvas” con margini più generosi
     fig = go.Figure()
-    # nasconde assi e griglia, sfondo scuro elegante
     fig.update_layout(
         template="plotly_white",
         xaxis=dict(visible=False),
         yaxis=dict(visible=False),
         plot_bgcolor="#0f172a",
         paper_bgcolor="#0f172a",
-        margin=dict(l=40, r=40, t=60, b=40),
-        title=dict(text="Scheda", x=0.5, xanchor="center", font=dict(color="#f1f5f9", size=22)),
+        # margini più ampi evitano che il bordo del box vada a filo
+        margin=dict(l=80, r=80, t=80, b=80),
+        title=dict(
+            text="Scheda",
+            x=0.5, xanchor="center", y=0.98,
+            font=dict(color="#f1f5f9", size=22)
+        ),
+        height=620,  # aumenta l’altezza per dare aria al contenuto
     )
     
+    # 3) “Card” centrale: shape rettangolare centrato
+    #    (regola x0/x1/y0/y1 se vuoi più o meno padding)
+    x0, x1 = 0.08, 0.92
+    y0, y1 = 0.14, 0.86
+    
+    fig.add_shape(
+        type="rect",
+        xref="paper", yref="paper",
+        x0=x0, y0=y0, x1=x1, y1=y1,
+        line=dict(color="#1f2937", width=1),
+        fillcolor="#111827",
+        layer="below"  # il rettangolo va sotto l'annotazione
+    )
+    
+    # 4) Annotazione centrata nel box, con ancoraggi espliciti
     fig.add_annotation(
-        x=0.5, y=0.5, xref="paper", yref="paper",
-        text=text,
+        x=(x0 + x1)/2,
+        y=(y0 + y1)/2,
+        xref="paper", yref="paper",
+        xanchor="center", yanchor="middle",
+        text=wrapped_text,         # usa il testo wrappato
         showarrow=False,
         font=dict(size=18, color="#e5e7eb"),
-        align="left",
+        align="left",              # 'left' = migliore leggibilità per righe lunghe
         bordercolor="#1f2937",
         borderwidth=1,
-        borderpad=12,
-        bgcolor="#111827",
-        opacity=0.98,
+        borderpad=14,              # padding interno del riquadro di annotazione
+        bgcolor="rgba(0,0,0,0)",   # trasparente: il background lo dà lo shape
+        opacity=1.0,
     )
+    
+    # (opzionale) Aumenta la responsività del contenuto su schermi stretti:
+    # - Riduci la font-size se il grafico è stretto (puoi usare media queries solo in CSS esterno)
+    # - In alternativa, scegli un max-width più piccolo per wrapped_text:
+    #   wrapped_text = wrap_html(text, max_px=680, align="left")
+
+return fig
+
 
 
 
