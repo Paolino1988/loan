@@ -160,7 +160,8 @@ app.layout = html.Div(
 )
 def update_graph(a, b, c,d,e):
 
-    list_amount, list_months = amount_1(c, b, a / 1200)
+    list_amount = amount_1(c, b, a / 1200)[0]
+    list_months = amount_1(c, b, a / 1200)[1]
     list_amount_1 = amount_2(c, list_months, a / 1200,1 / 100)[0]
     point_infl = amount_2(c, list_months, a / 1200,d / 100)[1]
     
