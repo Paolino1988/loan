@@ -119,7 +119,7 @@ app.layout = html.Div(
         html.Label("Rata"),
         dcc.Slider(
             id="b-slider",
-            min=0,
+            min=50,
             max=1000,
             step=50,
             value=150,
