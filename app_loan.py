@@ -330,9 +330,6 @@ def update_graph(a, b, c,d,e,f,g):
     # - In alternativa, scegli un max-width più piccolo per wrapped_text:
     #   wrapped_text = wrap_html(text, max_px=680, align="left")
 
-return fig
-
-
 
 
     return fig
