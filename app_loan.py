@@ -158,7 +158,7 @@ app.layout = html.Div(
     Input("d-slider", "value"),
     Input("e-slider", "value")
 )
-def update_graph(a, b, c,d):
+def update_graph(a, b, c,d,e):
 
     list_amount, list_months = amount_1(c, b, a / 1200)
     list_amount_1 = amount_2(c, list_months, a / 1200,1 / 100)[0]
