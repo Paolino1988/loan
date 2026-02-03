@@ -70,7 +70,7 @@ def amount_3(q,list_months, r,d):
 
 
 
-def amount_4(q,m,list_months, r,dr,r_min,d):
+def amount_4(q,m,list_months, r,dr,d):
     list_am2 = []
 
     Q = 0
@@ -79,7 +79,7 @@ def amount_4(q,m,list_months, r,dr,r_min,d):
       if n % m==0 and r>dr:
         r=r-dr
       elif r<=dr:
-        r=r_min
+        r=0.05/1200
       
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
@@ -99,7 +99,7 @@ app.title = "Andamento Rata/Debito"
 server = app.server 
 
 app.layout = html.Div(
-    style={"width": "80%", "margin": "auto", "padding": "24px", "backgroundColor": "#0f172a"},
+    style={"width": "80%", "margin": "auto", "padding": "24px", "backgroundColor": "#ffffff"},
     children=[
 
         html.H2("Dashboard Dash – Plot dinamici"),
@@ -204,7 +204,8 @@ app.layout = html.Div(
     Input("b-slider", "value"),
     Input("c-slider", "value"),
     Input("d-slider", "value"),
-    Input("e-slider", "value")
+    Input("f-slider", "value"),
+    Input("g-slider", "value")
 )
 def update_graph(a, b, c,d,e,f,g):
 
