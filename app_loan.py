@@ -227,6 +227,14 @@ def update_graph(a, b, c,d,e):
         height=500
     )
 
+    return fig
+
+
+
+
+
+
+
 
 if __name__ == '__main__':
     app.run_server(
