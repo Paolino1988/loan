@@ -70,16 +70,19 @@ def amount_3(q,list_months, r,d):
 
 def amount_4(q,m,list_months, r,dr,d):
     list_am2 = []
+
     Q = 0
     ii=0
     for n in list_months:
 
-      if n % m==0 and r>dr:
-        r=r-dr
+      if n % m==0:
+        if r>dr:
+          r=r-dr
 
-      elif r<=0.5/1200 and n>=m:
-        r=0.5/1200
-     
+        elif (r<=0.5/1200 or r == dr) and n>=m and n < list_months[-1]-8:
+          r=0.5/1200
+        else:
+          r=0.5/1200
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
 
@@ -194,11 +197,11 @@ app.layout = html.Div(
         html.Label("Percentuale di sottrazione del tasso di renumerazione rispetto al periodo di rotazione"),
         dcc.Slider(
            id="g-slider",
-            min=0.5,
+            min=0.25,
             max=2,
-            step=0.5,
+            step=0.25,
             value=1,
-            marks={i: f"{i}%" for i in [0.5, 1, 1.5, 2]}
+            marks={i: f"{i}%" for i in [0.25,0.5 ,1,1.25, 1.5,1.75, 2]}
         ),
 
 
