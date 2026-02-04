@@ -79,7 +79,7 @@ def amount_4(q,m,list_months, r,dr,d):
       if n % m==0 and r>dr:
         r=r-dr
       elif r<=dr:
-        r=0.05/1200
+        r=0.5/1200
       
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
@@ -371,7 +371,7 @@ def update_graph(a, b, c, d, e, f, g):
             html.Div(
                 [
                     html.Span(
-                        f"PAC variabile {e}% annua − {g}% ogni {f} mesi",
+                        f"PAC variabile {e}% annua − {g}% ogni {f} mesi con minimo di 0.5%",
                         className="summary-label",
                         style={"color": color_var},
                     ),
