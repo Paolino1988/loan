@@ -191,7 +191,13 @@ app.layout = html.Div(
 
 
 
-      dcc.Graph(id = "summary-box") 
+      
+    dcc.Graph(
+        id="summary-box",
+        config={"displayModeBar": False},
+        style={"height": "70vh"} 
+    )
+
     ]
 )
 
@@ -254,29 +260,73 @@ def update_graph(a, b, c,d,e,f,g):
     
    
    
-    def wrap_html(html_text, max_px=780, align="left"):
+
+    # --- Card responsive stile "mobile" per Annotazione Plotly ---
+    
+    def estimate_text_stats(html_inline_text: str):
         """
-        Incapsula il testo HTML in un contenitore con larghezza massima e wrapping.
-        align: 'left' | 'center'
+        Heuristica semplice per adattare font-size e altezza figura:
+        - conta le righe in base ai <br>
+        - stima la larghezza massima per righe lunghe
         """
-        text_align = "left" if align not in ("left", "center") else align
-        return (
-            f"<div style='"
-            f"max-width:{max_px}px;"
-            f"white-space:normal;"
-            f"line-height:1.35;"
-            f"text-align:{text_align};"
-            f"'>"
-            f"{html_text}"
-            f"</div>"
-        )
+        # normalizza: togli tag che non impattano sul conteggio righe
+        clean = html_inline_text.replace("</b>", "").replace("</span>", "")
+        # spezza in righe sui <br>
+        lines = [ln.strip() for ln in clean.split("<br>") if ln.strip() != ""]
+        n_lines = max(1, len(lines))
     
-    # ... dentro update_graph, dopo aver costruito la variabile `text` ...
+        # stima lunghezza massima (numero caratteri) tra le righe
+        import re
+        # rimuovi i tag <span ...>
+        span_re = re.compile(r"<span[^>]*>", re.IGNORECASE)
+        no_tags_lines = [re.sub(span_re, "", ln) for ln in lines]
+        max_line_len = max((len(ln) for ln in no_tags_lines), default=0)
     
-    # 1) Wrapping del testo con contenitore a larghezza controllata
-    wrapped_text = wrap_html(text, max_px=820, align="left")
+        return n_lines, max_line_len
     
-    # 2) Figura “canvas” con margini più generosi
+    def pick_font_and_layout(n_lines: int, max_line_len: int):
+        """
+        Regole:
+        - più righe → font più piccolo e figura più alta
+        - righe molto lunghe → riduci leggermente il font
+        """
+        # base
+        font_size = 20
+        height = 520
+        v_center = 0.5  # centro verticale
+    
+        # aggiusta per numero di righe
+        if n_lines <= 8:
+            font_size = 20
+            height = 560
+        elif n_lines <= 12:
+            font_size = 18
+            height = 640
+        elif n_lines <= 16:
+            font_size = 17
+            height = 720
+        else:
+            font_size = 16
+            height = 800
+    
+        # aggiusta per righe molto lunghe
+        if max_line_len >= 110:
+            font_size -= 2
+        elif max_line_len >= 90:
+            font_size -= 1
+    
+        # clamp minimo/massimo
+        font_size = max(14, min(font_size, 22))
+        height = max(520, min(height, 960))
+    
+        return font_size, height, v_center
+    
+    # 1) Stima righe e lunghezza
+    _n_lines, _max_line_len = estimate_text_stats(text)
+    # 2) Scegli font-size e height in modo adattivo
+    _font_size, _height, _y_center = pick_font_and_layout(_n_lines, _max_line_len)
+    
+    # 3) Crea figura con margini e titolo; margini un po' più ampi su mobile
     fig = go.Figure()
     fig.update_layout(
         template="plotly_white",
@@ -284,19 +334,19 @@ def update_graph(a, b, c,d,e,f,g):
         yaxis=dict(visible=False),
         plot_bgcolor="#0f172a",
         paper_bgcolor="#0f172a",
-        # margini più ampi evitano che il bordo del box vada a filo
-        margin=dict(l=80, r=80, t=80, b=80),
+        margin=dict(l=56, r=56, t=80, b=56),
         title=dict(
             text="Scheda",
-            x=0.5, xanchor="center", y=0.98,
+            x=0.5,
+            xanchor="center",
             font=dict(color="#f1f5f9", size=22)
         ),
-        height=620,  # aumenta l’altezza per dare aria al contenuto
+        height=_height,
     )
     
-    # 3) “Card” centrale: shape rettangolare centrato
-    #    (regola x0/x1/y0/y1 se vuoi più o meno padding)
-    x0, x1 = 0.08, 0.92
+    # 4) "Card" centrale: shape rettangolare responsivo (padding interno comodo)
+    #    Allarga leggermente i bordi su schermi piccoli grazie ai margini sopra
+    x0, x1 = 0.07, 0.93
     y0, y1 = 0.14, 0.86
     
     fig.add_shape(
@@ -305,34 +355,28 @@ def update_graph(a, b, c,d,e,f,g):
         x0=x0, y0=y0, x1=x1, y1=y1,
         line=dict(color="#1f2937", width=1),
         fillcolor="#111827",
-        layer="below"  # il rettangolo va sotto l'annotazione
+        layer="below"
     )
     
-    # 4) Annotazione centrata nel box, con ancoraggi espliciti
+    # 5) Annotazione centrata nel box; solo HTML inline in `text`
     fig.add_annotation(
-        x=(x0 + x1)/2,
-        y=(y0 + y1)/2,
+        x=(x0 + x1) / 2,
+        y=(y0 + y1) / 2,
         xref="paper", yref="paper",
         xanchor="center", yanchor="middle",
-        text=wrapped_text,         # usa il testo wrappato
+        text=text,                 # <-- usa il tuo testo con <b>, <span>, <br>
         showarrow=False,
-        font=dict(size=18, color="#e5e7eb"),
-        align="left",              # 'left' = migliore leggibilità per righe lunghe
+        align="left",              # 'left' = leggibilità migliore per righe lunghe
+        font=dict(size=_font_size, color="#e5e7eb"),
         bordercolor="#1f2937",
         borderwidth=1,
-        borderpad=14,              # padding interno del riquadro di annotazione
-        bgcolor="rgba(0,0,0,0)",   # trasparente: il background lo dà lo shape
+        borderpad=14,
+        bgcolor="rgba(0,0,0,0)",   # sfondo fornito dallo shape
         opacity=1.0,
     )
-    
-    # (opzionale) Aumenta la responsività del contenuto su schermi stretti:
-    # - Riduci la font-size se il grafico è stretto (puoi usare media queries solo in CSS esterno)
-    # - In alternativa, scegli un max-width più piccolo per wrapped_text:
-    #   wrapped_text = wrap_html(text, max_px=680, align="left")
-
-
 
     return fig
+
 
 
 
