@@ -17,7 +17,7 @@ def amount_1(X, q, r):
     list_am1.append(s)
 
     while Q >= q:
-        Q = (Q - q) * (1 + r)
+        Q = (Q) * (1 + r) - q
         n += 1
         list_months.append(n)
         s += q
