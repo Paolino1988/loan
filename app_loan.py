@@ -151,7 +151,7 @@ app.layout = html.Div(
             max=10000,
             step=500,
             value=8000,
-            marks={i: str(i) for i in range(1000, 10001, 2000)}
+            marks={i: str(i) for i in range(1000, 10002, 1000)}
         ),
 
         html.Br(),
@@ -188,7 +188,7 @@ app.layout = html.Div(
             max=12,
             step=3,
             value=3,
-            marks={i: str(i) for i in range(2, 12, 3)}
+            marks={i: str(i) for i in [3,6,9,12]}
         ),
         
         
@@ -201,7 +201,7 @@ app.layout = html.Div(
             max=2,
             step=0.25,
             value=1,
-            marks={i: f"{i}%" for i in [0.25,0.5 ,1,1.25, 1.5,1.75, 2]}
+            marks={i: f"{i}%" for i in [0.25,0.5,0.75 ,1,1.25, 1.5,1.75, 2]}
         ),
 
 
