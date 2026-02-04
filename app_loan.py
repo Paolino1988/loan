@@ -203,24 +203,12 @@ app.layout = html.Div(
         ),
 
 
-
-
-    
-        dcc.Store(id="viewport-store"),
-        dcc.Interval(id="viewport-ping", interval=200, n_intervals=0, max_intervals=1),
         
         dcc.Graph(
-            id="summary-box",
-            config={"displayModeBar": False, "responsive": True},
-            style={
-                "width": "100%",
-                "height": "75vh",     # occupa 75% della viewport
-                "maxHeight": "900px", # tetto massimo
-                "minHeight": "520px"  # minimo per non tagliare su desktop
-            }
+            id="summary-box"
         ),
 
-
+        html.Div(id="summary-box", className="summary-wrap")
     ]
 )
 
@@ -235,10 +223,9 @@ app.layout = html.Div(
     Input("d-slider", "value"),
     Input("e-slider", "value"),
     Input("f-slider", "value"),
-    Input("g-slider", "value"),
-    Input("viewport-store", "data")
+    Input("g-slider", "value")
 )
-def update_graph(a, b, c,d,e,f,g,viewport):
+def update_graph(a, b, c,d,e,f,g):
 
     list_amount = amount_1(c, b, a / 1200)[0]
     list_months = amount_1(c, b, a / 1200)[1]
