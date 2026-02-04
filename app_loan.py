@@ -68,19 +68,18 @@ def amount_3(q,list_months, r,d):
 # ------------------------
 
 
-
-
 def amount_4(q,m,list_months, r,dr,d):
     list_am2 = []
-
     Q = 0
     ii=0
     for n in list_months:
+
       if n % m==0 and r>dr:
         r=r-dr
-      elif r<=dr:
+
+      elif r<=0.5/1200 and n>=m:
         r=0.5/1200
-      
+     
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
 
