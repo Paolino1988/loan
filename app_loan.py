@@ -232,7 +232,7 @@ def update_graph(a, b, c, d, e, f, g):
     # ---------------------------
     list_amount, list_months = amount_1(c, b, a / 1200)
     list_amount_1, point_infl = amount_2(c, list_months, a / 1200, d / 100)
-    list_amount_2, point_infl1 = amount_3(b, list_months, a / 1200, d / 100)
+    list_amount_2, point_infl1 = amount_3(b, list_months, e / 1200, d / 100)
     list_amount_4, point_infl2 = amount_4(b, f, list_months, a / 1200, g / 1200, d / 100)
 
     final_accumulo_rate        = list_amount[-1]
