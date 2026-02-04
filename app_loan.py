@@ -204,9 +204,9 @@ app.layout = html.Div(
 
 
         
-        dcc.Graph(
-            id="summary-box"
-        ),
+        #dcc.Graph(
+        #    id="summary-box"
+        #),
 
         html.Div(id="summary-box", className="summary-wrap")
     ]
@@ -215,144 +215,196 @@ app.layout = html.Div(
 # ------------------------
 # Callback
 # ------------------------
+
 @app.callback(
-    Output("summary-box", "figure"),
+    Output("summary-box", "children"),
     Input("a-slider", "value"),
     Input("b-slider", "value"),
     Input("c-slider", "value"),
     Input("d-slider", "value"),
     Input("e-slider", "value"),
     Input("f-slider", "value"),
-    Input("g-slider", "value")
+    Input("g-slider", "value"),
 )
-def update_graph(a, b, c,d,e,f,g):
+def update_graph(a, b, c, d, e, f, g):
 
-    list_amount = amount_1(c, b, a / 1200)[0]
-    list_months = amount_1(c, b, a / 1200)[1]
-    list_amount_1 = amount_2(c, list_months, a / 1200, d / 100)[0]
-    point_infl = amount_2(c, list_months, a / 1200, d / 100)[1]
-    
-    list_amount_2, point_infl1 = amount_3(b, list_months, a/1200, d/100 )
-    list_amount_4, point_infl2 = amount_4(b, f, list_months, a/1200, g/1200, d / 100)
+    # ---------------------------
+    # 1) CALCOLI (identici ai tuoi)
+    # ---------------------------
+    list_amount, list_months = amount_1(c, b, a / 1200)
+    list_amount_1, point_infl = amount_2(c, list_months, a / 1200, d / 100)
+    list_amount_2, point_infl1 = amount_3(b, list_months, a / 1200, d / 100)
+    list_amount_4, point_infl2 = amount_4(b, f, list_months, a / 1200, g / 1200, d / 100)
 
-
-    
-    
-    final_accumulo_rate = list_amount[-1] if list_amount else None
-    final_debito_cumulato = list_amount_1[-1] if list_amount_1 else None
+    final_accumulo_rate        = list_amount[-1]
+    final_debito_cumulato      = list_amount_1[-1]
     final_debito_cumulato_infl = point_infl
-    final_capitale_cumulato = list_amount_2[-1] if list_amount_2 else None
-    final_capitale_cumulato_var = list_amount_4[-1] if list_amount_4 else None
-    
-    
-    
+    final_capitale_cumulato    = list_amount_2[-1]
+    final_capitale_cumulato_var= list_amount_4[-1]
+
+    # ---------------------------
+    # 2) FORMATTAZIONE NUMERI
+    # ---------------------------
     def format_currency(x, symbol="€"):
-        # formattazione compatta: separatore migliaia, zero decimali
         try:
             return f"{symbol} {x:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
-        except Exception:
+        except:
             return f"{symbol} {x}"
-    
-    
-    def fmt(x): return format_currency(x)
-    
-    text = (
-          f"<b>Riepilogo</b><br><br>"
-          f"<span style='color:	#adff2f'>Numero di Mesi per estinzione rispetto alla Rata fissata di {fmt(200)}</span>: <b>{list_months[-1]}</b><br>"
-          f"<span style='color:#60a5fa'>Accumulo rate mensili per estinzione</span>: <b>{fmt(final_accumulo_rate)}</b><br>"
-          f"<span style='color:#ef4444'>Debito cumulato senza rate nello stesso periodo</span>: <b>{fmt(final_debito_cumulato)}</b><br>"
-          f"<span style='color:#ef4444'>Debito cumulato normalizzato per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(final_debito_cumulato_infl)}</b><br>"
-          f"<span style='color:#34d399'>Capitale cumulato valutando un PAC pari alla rata di {fmt(200)} con remunerazione fissa del 3% </span>: <b>{fmt(final_capitale_cumulato)}</b><br>"
-          f"<span style='color:#34d399'>_____ per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(point_infl1)}</b><br>"
-          f"<span style='color:#ffd700'>Capitale cumulato valutando un PAC pari alla rata di {fmt(200)} con remunerazione fissa del 3% variabile ogni 6 mesi diminuito del 1% </span>: <b>{fmt(final_capitale_cumulato_var)}</b><br>"
-          f"<span style='color:#ffd700'>_____ per potere di acquisto inflazionato del {c}% annuo</span>: <b>{fmt(point_infl2)}</b>"
-     
-     )
-    
-   
-   
+
+    def fmt(x):
+        return "—" if x is None else format_currency(x)
+
+    # ---------------------------
+    # 3) COLORI
+    # ---------------------------
+    color_months = "#adff2f"
+    color_accumulo = "#60a5fa"
+    color_debito = "#ef4444"
+    color_pac = "#34d399"
+    color_var = "#ffd700"
+
+    # ---------------------------
+    # 4) RETURN DELLA CARD HTML
+    # ---------------------------
+    return html.Div(
+        [
+
+            html.Div("Riepilogo", className="summary-title"),
+            html.Div("Valori finali (ultimo punto di ciascuna serie)", className="summary-sub"),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Numero di mesi per estinzione (rata {fmt(b)})",
+                        className="summary-label",
+                        style={"color": color_months},
+                    ),
+                    html.Span(
+                        f"{list_months[-1]}",
+                        className="summary-value",
+                        style={"color": color_months},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        "Accumulo rate mensili per estinzione",
+                        className="summary-label",
+                        style={"color": color_accumulo},
+                    ),
+                    html.Span(
+                        fmt(final_accumulo_rate),
+                        className="summary-value",
+                        style={"color": color_accumulo},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        "Debito cumulato senza rate nello stesso periodo",
+                        className="summary-label",
+                        style={"color": color_debito},
+                    ),
+                    html.Span(
+                        fmt(final_debito_cumulato),
+                        className="summary-value",
+                        style={"color": color_debito},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Debito cumulato normalizzato per inflazione {d}%",
+                        className="summary-label",
+                        style={"color": color_debito},
+                    ),
+                    html.Span(
+                        fmt(final_debito_cumulato_infl),
+                        className="summary-value",
+                        style={"color": color_debito},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"PAC (rata {fmt(b)}) remunerazione fissa {e}%",
+                        className="summary-label",
+                        style={"color": color_pac},
+                    ),
+                    html.Span(
+                        fmt(final_capitale_cumulato),
+                        className="summary-value",
+                        style={"color": color_pac},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"... normalizzato per inflazione {d}%",
+                        className="summary-label",
+                        style={"color": color_pac},
+                    ),
+                    html.Span(
+                        fmt(point_infl1),
+                        className="summary-value",
+                        style={"color": color_pac},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"PAC variabile {e}% annua − {g}% ogni {f} mesi",
+                        className="summary-label",
+                        style={"color": color_var},
+                    ),
+                    html.Span(
+                        fmt(final_capitale_cumulato_var),
+                        className="summary-value",
+                        style={"color": color_var},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"... normalizzato per inflazione {d}%",
+                        className="summary-label",
+                        style={"color": color_var},
+                    ),
+                    html.Span(
+                        fmt(point_infl2),
+                        className="summary-value",
+                        style={"color": color_var},
+                    ),
+                ],
+                className="summary-row",
+            ),
+        ],
+        className="summary-card"
+    )
 
   
-    # --- Card "stile app mobile" completamente adattiva ---
-    
-    # 1) Legge dimensioni viewport (con fallback)
-    vw = (viewport or {}).get("w", 1200)
-    vh = (viewport or {}).get("h", 800)
-    
-    # 2) Euristica per font/margini/altezza in base alla larghezza del device
-    if vw <= 480:          # telefoni piccoli
-        font_size = 14
-        fig_height = int(vh * 0.72)
-        margins = dict(l=20, r=20, t=56, b=20)
-        x0, x1 = 0.06, 0.94
-        y0, y1 = 0.16, 0.84
-    elif vw <= 768:        # telefoni grandi / piccoli tablet
-        font_size = 16
-        fig_height = int(vh * 0.72)
-        margins = dict(l=28, r=28, t=64, b=28)
-        x0, x1 = 0.06, 0.94
-        y0, y1 = 0.16, 0.84
-    elif vw <= 1024:       # tablet / piccoli laptop
-        font_size = 17
-        fig_height = int(vh * 0.74)
-        margins = dict(l=36, r=36, t=68, b=36)
-        x0, x1 = 0.07, 0.93
-        y0, y1 = 0.16, 0.84
-    else:                  # desktop
-        font_size = 18
-        fig_height = min(int(vh * 0.75), 900)
-        margins = dict(l=40, r=40, t=72, b=40)
-        x0, x1 = 0.07, 0.93
-        y0, y1 = 0.16, 0.84
-    
-    # 3) Crea figura responsiva (nessuna altezza fissa nel Graph; la diamo qui)
-    fig = go.Figure()
-    fig.update_layout(
-        autosize=True,
-        xaxis=dict(visible=False),
-        yaxis=dict(visible=False),
-        plot_bgcolor="#0f172a",
-        paper_bgcolor="#0f172a",
-        margin=margins,
-        title=dict(
-            text="Scheda",
-            x=0.5, xanchor="center",
-            font=dict(color="#f1f5f9", size=22)
-        ),
-        height=fig_height,
-    )
-    
-    # 4) "Card" centrale (shape rettangolare, sempre centrato)
-    fig.add_shape(
-        type="rect",
-        xref="paper", yref="paper",
-        x0=x0, y0=y0, x1=x1, y1=y1,
-        line=dict(color="#1f2937", width=1),
-        fillcolor="#111827",
-        layer="below"
-    )
-    
-    # 5) Annotazione centrata, solo HTML inline in `text`
-    fig.add_annotation(
-        x=(x0 + x1) / 2,
-        y=(y0 + y1) / 2,
-        xref="paper", yref="paper",
-        xanchor="center", yanchor="middle",
-        text=text,                  # <b>, <span>, <br> — niente <div>
-        showarrow=False,
-        align="left",               # 'left' = leggibile con righe lunghe
-        font=dict(size=font_size, color="#e5e7eb"),
-        bordercolor="#1f2937",
-        borderwidth=1,
-        borderpad=14,
-        bgcolor="rgba(0,0,0,0)",
-        opacity=1.0,
-    )
-
-
-
-
-    return fig
+   
 
 
 
