@@ -95,6 +95,20 @@ def amount_4(q,m,list_months, r,dr,d):
 # ------------------------
 
 app = dash.Dash(__name__)
+
+app.clientside_callback(
+    """
+    function(n) {
+        if (typeof window === 'undefined') {
+            return {'w': 1200, 'h': 800};
+        }
+        return {'w': window.innerWidth, 'h': window.innerHeight};
+    }
+    """,
+    Output("viewport-store", "data"),
+    Input("viewport-ping", "n_intervals"),
+)
+
 app.title = "Andamento Rata/Debito"
 server = app.server 
 
@@ -191,12 +205,21 @@ app.layout = html.Div(
 
 
 
-      
-    dcc.Graph(
-        id="summary-box",
-        config={"displayModeBar": False},
-        style={"height": "70vh"} 
-    )
+    
+        dcc.Store(id="viewport-store"),
+        dcc.Interval(id="viewport-ping", interval=200, n_intervals=0, max_intervals=1),
+        
+        dcc.Graph(
+            id="summary-box",
+            config={"displayModeBar": False, "responsive": True},
+            style={
+                "width": "100%",
+                "height": "75vh",     # occupa 75% della viewport
+                "maxHeight": "900px", # tetto massimo
+                "minHeight": "520px"  # minimo per non tagliare su desktop
+            }
+        ),
+
 
     ]
 )
@@ -212,9 +235,10 @@ app.layout = html.Div(
     Input("d-slider", "value"),
     Input("e-slider", "value"),
     Input("f-slider", "value"),
-    Input("g-slider", "value")
+    Input("g-slider", "value"),
+    Input("viewport-store", "data")
 )
-def update_graph(a, b, c,d,e,f,g):
+def update_graph(a, b, c,d,e,f,g,viewport):
 
     list_amount = amount_1(c, b, a / 1200)[0]
     list_months = amount_1(c, b, a / 1200)[1]
@@ -261,94 +285,57 @@ def update_graph(a, b, c,d,e,f,g):
    
    
 
-    # --- Card responsive stile "mobile" per Annotazione Plotly ---
+  
+    # --- Card "stile app mobile" completamente adattiva ---
     
-    def estimate_text_stats(html_inline_text: str):
-        """
-        Heuristica semplice per adattare font-size e altezza figura:
-        - conta le righe in base ai <br>
-        - stima la larghezza massima per righe lunghe
-        """
-        # normalizza: togli tag che non impattano sul conteggio righe
-        clean = html_inline_text.replace("</b>", "").replace("</span>", "")
-        # spezza in righe sui <br>
-        lines = [ln.strip() for ln in clean.split("<br>") if ln.strip() != ""]
-        n_lines = max(1, len(lines))
+    # 1) Legge dimensioni viewport (con fallback)
+    vw = (viewport or {}).get("w", 1200)
+    vh = (viewport or {}).get("h", 800)
     
-        # stima lunghezza massima (numero caratteri) tra le righe
-        import re
-        # rimuovi i tag <span ...>
-        span_re = re.compile(r"<span[^>]*>", re.IGNORECASE)
-        no_tags_lines = [re.sub(span_re, "", ln) for ln in lines]
-        max_line_len = max((len(ln) for ln in no_tags_lines), default=0)
+    # 2) Euristica per font/margini/altezza in base alla larghezza del device
+    if vw <= 480:          # telefoni piccoli
+        font_size = 14
+        fig_height = int(vh * 0.72)
+        margins = dict(l=20, r=20, t=56, b=20)
+        x0, x1 = 0.06, 0.94
+        y0, y1 = 0.16, 0.84
+    elif vw <= 768:        # telefoni grandi / piccoli tablet
+        font_size = 16
+        fig_height = int(vh * 0.72)
+        margins = dict(l=28, r=28, t=64, b=28)
+        x0, x1 = 0.06, 0.94
+        y0, y1 = 0.16, 0.84
+    elif vw <= 1024:       # tablet / piccoli laptop
+        font_size = 17
+        fig_height = int(vh * 0.74)
+        margins = dict(l=36, r=36, t=68, b=36)
+        x0, x1 = 0.07, 0.93
+        y0, y1 = 0.16, 0.84
+    else:                  # desktop
+        font_size = 18
+        fig_height = min(int(vh * 0.75), 900)
+        margins = dict(l=40, r=40, t=72, b=40)
+        x0, x1 = 0.07, 0.93
+        y0, y1 = 0.16, 0.84
     
-        return n_lines, max_line_len
-    
-    def pick_font_and_layout(n_lines: int, max_line_len: int):
-        """
-        Regole:
-        - più righe → font più piccolo e figura più alta
-        - righe molto lunghe → riduci leggermente il font
-        """
-        # base
-        font_size = 20
-        height = 520
-        v_center = 0.5  # centro verticale
-    
-        # aggiusta per numero di righe
-        if n_lines <= 8:
-            font_size = 20
-            height = 560
-        elif n_lines <= 12:
-            font_size = 18
-            height = 640
-        elif n_lines <= 16:
-            font_size = 17
-            height = 720
-        else:
-            font_size = 16
-            height = 800
-    
-        # aggiusta per righe molto lunghe
-        if max_line_len >= 110:
-            font_size -= 2
-        elif max_line_len >= 90:
-            font_size -= 1
-    
-        # clamp minimo/massimo
-        font_size = max(14, min(font_size, 22))
-        height = max(520, min(height, 960))
-    
-        return font_size, height, v_center
-    
-    # 1) Stima righe e lunghezza
-    _n_lines, _max_line_len = estimate_text_stats(text)
-    # 2) Scegli font-size e height in modo adattivo
-    _font_size, _height, _y_center = pick_font_and_layout(_n_lines, _max_line_len)
-    
-    # 3) Crea figura con margini e titolo; margini un po' più ampi su mobile
+    # 3) Crea figura responsiva (nessuna altezza fissa nel Graph; la diamo qui)
     fig = go.Figure()
     fig.update_layout(
-        template="plotly_white",
+        autosize=True,
         xaxis=dict(visible=False),
         yaxis=dict(visible=False),
         plot_bgcolor="#0f172a",
         paper_bgcolor="#0f172a",
-        margin=dict(l=56, r=56, t=80, b=56),
+        margin=margins,
         title=dict(
             text="Scheda",
-            x=0.5,
-            xanchor="center",
+            x=0.5, xanchor="center",
             font=dict(color="#f1f5f9", size=22)
         ),
-        height=_height,
+        height=fig_height,
     )
     
-    # 4) "Card" centrale: shape rettangolare responsivo (padding interno comodo)
-    #    Allarga leggermente i bordi su schermi piccoli grazie ai margini sopra
-    x0, x1 = 0.07, 0.93
-    y0, y1 = 0.14, 0.86
-    
+    # 4) "Card" centrale (shape rettangolare, sempre centrato)
     fig.add_shape(
         type="rect",
         xref="paper", yref="paper",
@@ -358,22 +345,25 @@ def update_graph(a, b, c,d,e,f,g):
         layer="below"
     )
     
-    # 5) Annotazione centrata nel box; solo HTML inline in `text`
+    # 5) Annotazione centrata, solo HTML inline in `text`
     fig.add_annotation(
         x=(x0 + x1) / 2,
         y=(y0 + y1) / 2,
         xref="paper", yref="paper",
         xanchor="center", yanchor="middle",
-        text=text,                 # <-- usa il tuo testo con <b>, <span>, <br>
+        text=text,                  # <b>, <span>, <br> — niente <div>
         showarrow=False,
-        align="left",              # 'left' = leggibilità migliore per righe lunghe
-        font=dict(size=_font_size, color="#e5e7eb"),
+        align="left",               # 'left' = leggibile con righe lunghe
+        font=dict(size=font_size, color="#e5e7eb"),
         bordercolor="#1f2937",
         borderwidth=1,
         borderpad=14,
-        bgcolor="rgba(0,0,0,0)",   # sfondo fornito dallo shape
+        bgcolor="rgba(0,0,0,0)",
         opacity=1.0,
     )
+
+
+
 
     return fig
 
