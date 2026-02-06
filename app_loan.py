@@ -93,6 +93,29 @@ def amount_4(q,m,list_months, r,dr,d):
 
 
 
+## ------------------ rata mutuo ----------------------- ##
+
+def amount_mutuo(X,r,mm):
+    i = r/12
+    M = mm*12
+    q_f = (X*i*(1+i)**M)/((1+i)**M-1)
+    I_f = q*M - X
+
+    I_i = X*i*(M-1)/2
+    q_i_c = X/M
+    q_i_0 = q_i_c + X*i
+    q_i_f = q_i_c + X/M*i
+    q_i_m = q_i_c + I_i/M
+
+    return q_f, I_f, I_i, q_i_0, q_i_f, q_i_m
+
+
+##--------------------------------------------------
+
+
+
+
+
 # App Dash
 # ------------------------
 
@@ -119,6 +142,8 @@ app.layout = html.Div(
     children=[
 
         html.H2("Dashboard Dash – Plot dinamici"),
+
+        html.H1("Fido/Scoperti"),
 
         html.Label("Tasso annuo debito (%)"),
         dcc.Slider(
@@ -211,6 +236,51 @@ app.layout = html.Div(
         #),
 
         html.Div(id="summary-box", className="summary-wrap")
+
+        html.Br(),
+        
+        html.H1("Mutuo"),
+
+        html.Br(),
+
+        html.Label("Capitale in keuro"),
+        dcc.Slider(
+            id="x-slider",
+            min=50,
+            max=500,
+            step=25,
+            value=100,
+            marks={i: f"{i}%" for i in [j for j in range(50,500,25)]}
+        ),
+        
+        html.Br(),
+
+        html.Label("Numero di anni di Mutuo"),
+        dcc.Slider(
+            id="y-slider",
+            min=5,
+            max=40,
+            step=1,
+            value=10,
+            marks={i: str(i) for i in [j for j in range(5,41,5)]}
+        ),
+
+        html.Br(),
+
+        html.Label("Tasso annuo (%)"),
+        dcc.Slider(
+            id="z-slider",
+            min=0.0,
+            max=5,
+            step=0.25,
+            value=2,
+            marks={i: f"{i}%" for i in [j/100 for j in range(0,501,25)]}
+        ),
+
+
+        html.Div(id="summary-box-mutuo", className="summary-wrap")
+
+        
     ]
 )
 
@@ -405,12 +475,162 @@ def update_graph(a, b, c, d, e, f, g):
         className="summary-card"
     )
 
-  
+
+
+
+
+
    
+@app.callback(
+    Output("summary-box-mutuo", "children"),
+    Input("x-slider", "value"),
+    Input("z-slider", "value"),
+    Input("y-slider", "value")
+)
+def update_graph(x,z,y):
+
+    # ---------------------------
+    # 1) CALCOLI (identici ai tuoi)
+    # ---------------------------
+    list_result = amount_mutuo(X,z/100,y)
+    
+    q_f = list_result[0]
+    I_f = list_result[1]
+    I_i = list_result[2]
+    q_i_0 = list_result[3]    
+    q_i_f = list_result[4]
+    q_i_m = list_result[5]
 
 
+    # ---------------------------
+    # 2) FORMATTAZIONE NUMERI
+    # ---------------------------
+    def format_currency(x, symbol="€"):
+        try:
+            return f"{symbol} {x:,.0f}".replace(",", "X").replace(".", ",").replace("X", ".")
+        except:
+            return f"{symbol} {x}"
+
+    def fmt(x):
+        return "—" if x is None else format_currency(x)
+
+    # ---------------------------
+    # 3) COLORI
+    # ---------------------------
+    color_rata_fr = "#adff2f"
+    color_interessi_fr = "#60a5fa"
+    color_interessi_ita = "#ef4444"
+    color_rata_it_0 = "#34d399"
+    color_rata_it_f = "#ffd700"
+    color_rata_it_m = "#8a2be2"
+
+    # ---------------------------
+    # 4) RETURN DELLA CARD HTML
+    # ---------------------------
+    
 
 
+    return html.Div(
+        [
+
+            html.Div("Riepilogo Mutuo", className="summary-title"),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Rata con Ammortamento Francese",
+                        className="summary-label",
+                        style={"color": color_rata_fr},
+                    ),
+                    html.Span(
+                        f"{q_f}",
+                        className="summary-value",
+                        style={"color": color_rata_fr},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        "Interessi totali con Ammortamento Francese con APR {z}%",
+                        className="summary-label",
+                        style={"color": color_interesse_fr},
+                    ),
+                    html.Span(
+                        fmt(I_f),
+                        className="summary-value",
+                        style={"color": color_interesse_fr},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        "Interessi totali con Ammortamento Italiano con APR {z}%",
+                        className="summary-label",
+                        style={"color": color_interessi_it},
+                    ),
+                    html.Span(
+                        fmt(I_i),
+                        className="summary-value",
+                        style={"color": color_interessi_it},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Prima rata con Ammortamento Italiano (rata massima)",
+                        className="summary-label",
+                        style={"color": color_rata_it_0},
+                    ),
+                    html.Span(
+                        fmt(q_i_0),
+                        className="summary-value",
+                        style={"color": color_rata_it_0},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Ultima rata con Ammortamento Italiano (rata minima)",
+                        className="summary-label",
+                        style={"color": color_rata_it_f},
+                    ),
+                    html.Span(
+                        fmt(q_i_f),
+                        className="summary-value",
+                        style={"color": color_rata_it_f},
+                    ),
+                ],
+                className="summary-row",
+            ),
+
+
+            html.Div(
+                [
+                    html.Span(
+                        f"Rata Media con Ammortamento Italiano",
+                        className="summary-label",
+                        style={"color": color_rata_it_m},
+                    ),
+                    html.Span(
+                        fmt(q_i_m),
+                        className="summary-value",
+                        style={"color": color_rata_it_m},
+                    ),
+                ],
+                className="summary-row",
+            ),
 
 
 
