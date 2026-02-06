@@ -235,7 +235,7 @@ app.layout = html.Div(
         #    id="summary-box"
         #),
 
-        html.Div(id="summary-box", className="summary-wrap")
+        html.Div(id="summary-box", className="summary-wrap"),
 
         html.Br(),
         
