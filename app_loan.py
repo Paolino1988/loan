@@ -631,6 +631,8 @@ def update_graph(x,z,y):
                 ],
                 className="summary-row",
             ),
+    ]
+)
 
 
 
