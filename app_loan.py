@@ -250,7 +250,7 @@ app.layout = html.Div(
             max=500,
             step=25,
             value=100,
-            marks={i: f"{i}%" for i in [j for j in range(50,500,25)]}
+            marks={i: f"{i}" for i in [j for j in range(50,500,25)]}
         ),
         
         html.Br(),
@@ -274,7 +274,7 @@ app.layout = html.Div(
             max=5,
             step=0.25,
             value=2,
-            marks={i: f"{i}%" for i in [j/100 for j in range(0,501,25)]}
+            marks={i: f"{i}%" for i in [j/100 for j in range(0,505,50)]}
         ),
 
 
@@ -631,8 +631,9 @@ def update_graph(x,z,y):
                 ],
                 className="summary-row",
             ),
-    ]
-)
+        ],
+        className="summary-card"
+    )
 
 
 
