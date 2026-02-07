@@ -480,7 +480,6 @@ def update_graph(a, b, c, d, e, f, g):
 
 
 
-   
 @app.callback(
     Output("summary-box-mutuo", "children"),
     Input("x-slider", "value"),
@@ -492,7 +491,7 @@ def update_graph(x,z,y):
     # ---------------------------
     # 1) CALCOLI (identici ai tuoi)
     # ---------------------------
-    list_result = amount_mutuo(X,z/100,y)
+    list_result = amount_mutuo(x,z/100,y)
     
     q_f = list_result[0]
     I_f = list_result[1]
@@ -543,7 +542,7 @@ def update_graph(x,z,y):
                         style={"color": color_rata_fr},
                     ),
                     html.Span(
-                        f"{q_f}",
+                        fmt(q_f),
                         className="summary-value",
                         style={"color": color_rata_fr},
                     ),
@@ -554,14 +553,14 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        "Interessi totali con Ammortamento Francese con APR {z}%",
+                        f"Interessi totali con Ammortamento Francese con APR {z}%",
                         className="summary-label",
-                        style={"color": color_interesse_fr},
+                        style={"color": color_interessi_fr},
                     ),
                     html.Span(
                         fmt(I_f),
                         className="summary-value",
-                        style={"color": color_interesse_fr},
+                        style={"color": color_interessi_fr},
                     ),
                 ],
                 className="summary-row",
@@ -570,7 +569,7 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        "Interessi totali con Ammortamento Italiano con APR {z}%",
+                        f"Interessi totali con Ammortamento Italiano con APR {z}%",
                         className="summary-label",
                         style={"color": color_interessi_it},
                     ),
