@@ -491,7 +491,7 @@ def update_graph(x,z,y):
     # ---------------------------
     # 1) CALCOLI (identici ai tuoi)
     # ---------------------------
-    list_result = amount_mutuo(x,z/100,y)
+    list_result = amount_mutuo(1000*x,z/100,y)
     
     q_f = list_result[0]
     I_f = list_result[1]
