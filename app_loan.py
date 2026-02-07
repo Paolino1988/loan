@@ -99,7 +99,7 @@ def amount_mutuo(X,r,mm):
     i = r/12
     M = mm*12
     q_f = (X*i*(1+i)**M)/((1+i)**M-1)
-    I_f = q*M - X
+    I_f = q_f*M - X
 
     I_i = X*i*(M-1)/2
     q_i_c = X/M
