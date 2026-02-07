@@ -76,13 +76,11 @@ def amount_4(q,m,list_months, r,dr,d):
     for n in list_months:
 
       if n % m==0:
-        if r>dr:
+        if r>dr and r-dr>=0.5/1200:
           r=r-dr
-
-        elif (r<=0.5/1200 or r == dr) and n>=m and n < list_months[-1]-8:
-          r=0.5/1200
         else:
           r=0.5/1200
+   
       Q = (Q+q)*(1+r)
       list_am2.append(Q)
 
@@ -111,6 +109,40 @@ def amount_mutuo(X,r,mm):
 
 
 ##--------------------------------------------------
+
+
+## ------------------ ratio capitale/Interesse ----------------------- ##
+
+def ratio_mutuo(X,r,mm):
+    i = r/12
+    M = mm*12
+    q_f = (X*i*(1+i)**M)/((1+i)**M-1)
+    list_interessi_f=[X*i]
+    list_capitale_f = [0]
+    list_interessi_i = [X*i]
+    list_capitale_i = [0]
+    list_ratio = []
+    X_f = X
+    X_i = X
+    for k in range(1,M):
+        X_f=(X_f*(1+i)-q_f)
+        list_interessi_f.append(X_f*i)
+        list_capitale_f.append(q_f-X_f*i)
+
+        X_i = X_i*(1-k/M)
+        list_interessi_i.append(X_i*i)
+        list_capitale_i.append(X_i)
+        list_ratio.append((X_i*i)*100/(X_i/M+X_i*i))
+
+    
+    return [ (x/q_f)*100 for x in list_interessi_f],  list_ratio[0]
+
+
+##--------------------------------------------------
+
+
+
+
 
 
 
@@ -243,15 +275,14 @@ app.layout = html.Div(
 
         html.Br(),
 
-        html.Label("Capitale in keuro"),
-        dcc.Slider(
-            id="x-slider",
-            min=50,
-            max=500,
-            step=25,
+        html.Label("Capitale (keuro)"),
+        dcc.Input(
+            id="x-input",
+            type="number",
             value=100,
-            marks={i: f"{i}" for i in [j for j in range(50,500,25)]}
-        ),
+            min=50,
+            step=1
+        )
         
         html.Br(),
 
@@ -278,8 +309,11 @@ app.layout = html.Div(
         ),
 
 
-        html.Div(id="summary-box-mutuo", className="summary-wrap")
+        html.Div(id="summary-box-mutuo", className="summary-wrap"),
 
+        html.Br(),
+        
+        dcc.Graph(id="percent-graph")
         
     ]
 )
@@ -500,6 +534,7 @@ def update_graph(x,z,y):
     q_i_f = list_result[4]
     q_i_m = list_result[5]
 
+    perc_inter = ratio_mutuo(1000*x,z/100,y)[1]
 
     # ---------------------------
     # 2) FORMATTAZIONE NUMERI
@@ -522,6 +557,7 @@ def update_graph(x,z,y):
     color_rata_it_0 = "#34d399"
     color_rata_it_f = "#ffd700"
     color_rata_it_m = "#8a2be2"
+    col_ratio_mutuo = "#daa520"
 
     # ---------------------------
     # 4) RETURN DELLA CARD HTML
@@ -633,6 +669,78 @@ def update_graph(x,z,y):
         ],
         className="summary-card"
     )
+
+
+            html.Div(
+                [
+                    html.Span(
+                        "Percentuale di interesse pagata su ogni rata",
+                        className="summary-label",
+                        style={"color": col_ratio_mutuo},
+                    ),
+                    html.Span(
+                        fmt(ratio_mutuo),
+                        className="summary-value",
+                        style={"color": col_ratio_mutuo},
+                    ),
+                ],
+                className="summary-row",
+            ),
+        ],
+        className="summary-card"
+    )
+
+
+
+
+@app.callback(
+    Output("percent-graph", "figure"),
+    Input("x-slider", "value"),
+    Input("z-slider", "value"),
+    Input("y-slider", "value")
+)
+def update_graph(x,z,y):
+
+    # ---------------------------
+    # 1) CALCOLI (identici ai tuoi)
+    # ---------------------------
+    list_perc  = ratio_mutuo(1000*x,z/100,y)[0]
+    months = list(range(1, len(list_perc) + 1))
+
+    def percent_plot_from_list(list_perc):
+    months = list(range(1, len(list_perc) + 1))
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Scatter(
+            x=months,
+            y=list_perc,
+            mode="lines+markers",
+            line=dict(width=3),
+            marker=dict(size=6),
+            hovertemplate="Mese %{x}<br>%{y:.2f}%<extra></extra>",
+            name="Percentuale"
+        )
+    )
+
+    fig.update_layout(
+        title="Andamento percentuale nel tempo",
+        xaxis_title="Mesi",
+        yaxis_title="Percentuale",
+        yaxis_ticksuffix="%",
+        template="plotly_white",
+        height=400,
+        margin=dict(l=40, r=40, t=60, b=40)
+    )
+
+    return fig
+
+    
+
+
+
+
 
 
 
