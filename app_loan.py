@@ -537,7 +537,7 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Rata con Ammortamento Francese",
+                        f"Rata con Ammortamento Francese per numero mesi f{y}",
                         className="summary-label",
                         style={"color": color_rata_fr},
                     ),
@@ -585,7 +585,7 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Prima rata con Ammortamento Italiano (rata massima)",
+                        f"Prima rata con Ammortamento Italiano (rata massima) per numero mesi f{y}",
                         className="summary-label",
                         style={"color": color_rata_it_0},
                     ),
@@ -601,7 +601,7 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Ultima rata con Ammortamento Italiano (rata minima)",
+                        f"...ultima rata con Ammortamento Italiano (rata minima)",
                         className="summary-label",
                         style={"color": color_rata_it_f},
                     ),
@@ -618,7 +618,7 @@ def update_graph(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Rata Media con Ammortamento Italiano",
+                        f"...Rata Media con Ammortamento Italiano",
                         className="summary-label",
                         style={"color": color_rata_it_m},
                     ),
