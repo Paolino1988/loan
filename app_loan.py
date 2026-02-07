@@ -571,12 +571,12 @@ def update_graph(x,z,y):
                     html.Span(
                         f"Interessi totali con Ammortamento Italiano con APR {z}%",
                         className="summary-label",
-                        style={"color": color_interessi_it},
+                        style={"color": color_interessi_ita},
                     ),
                     html.Span(
                         fmt(I_i),
                         className="summary-value",
-                        style={"color": color_interessi_it},
+                        style={"color": color_interessi_ita},
                     ),
                 ],
                 className="summary-row",
