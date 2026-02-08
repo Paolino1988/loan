@@ -693,7 +693,6 @@ def update_graph(x,z,y):
 
 
 
-
 @app.callback(
     Output("percent-graph", "figure"),
     Input("x-slider", "value"),
