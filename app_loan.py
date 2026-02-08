@@ -3,6 +3,7 @@ import dash
 from dash import Dash, dash_table, dcc, html
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import os
 
 # ------------------------
 # Funzione di calcolo
@@ -172,7 +173,9 @@ server = app.server
 app.layout = html.Div(
     style={"width": "80%", "margin": "auto", "padding": "24px", "backgroundColor": "#ffffff"},
     children=[
-
+        dcc.Store(id="viewport-store"),
+        dcc.Interval(id="viewport-ping", interval=1000),
+        
         html.H2("Dashboard Dash – Plot dinamici"),
 
         html.H1("Fido/Scoperti"),
@@ -288,7 +291,7 @@ app.layout = html.Div(
 
         html.Label("Numero di anni di Mutuo"),
         dcc.Slider(
-            id="y-slider",
+            id="y-input",
             min=5,
             max=40,
             step=1,
@@ -300,7 +303,7 @@ app.layout = html.Div(
 
         html.Label("Tasso annuo (%)"),
         dcc.Slider(
-            id="z-slider",
+            id="z-input",
             min=0.0,
             max=5,
             step=0.25,
@@ -516,9 +519,9 @@ def update_fido(a, b, c, d, e, f, g):
 
 @app.callback(
     Output("summary-box-mutuo", "children"),
-    Input("x-slider", "value"),
-    Input("z-slider", "value"),
-    Input("y-slider", "value")
+    Input("x-input", "value"),
+    Input("z-input", "value"),
+    Input("y-input", "value")
 )
 def update_mutuo(x,z,y):
 
@@ -695,9 +698,9 @@ def update_mutuo(x,z,y):
 
 @app.callback(
     Output("percent-graph", "figure"),
-    Input("x-slider", "value"),
-    Input("z-slider", "value"),
-    Input("y-slider", "value")
+    Input("x-input", "value"),
+    Input("z-input", "value"),
+    Input("y-input", "value")
 )
 def update_graph(x,z,y):
 
