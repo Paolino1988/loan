@@ -708,7 +708,7 @@ def update_graph(x,z,y):
     months = list(range(1, len(list_perc) + 1))
 
     def percent_plot_from_list(list_perc):
-    months = list(range(1, len(list_perc) + 1))
+        months = list(range(1, len(list_perc) + 1))
 
     fig = go.Figure()
 
