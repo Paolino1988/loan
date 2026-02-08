@@ -332,7 +332,7 @@ app.layout = html.Div(
     Input("f-slider", "value"),
     Input("g-slider", "value"),
 )
-def update_graph(a, b, c, d, e, f, g):
+def update_fido(a, b, c, d, e, f, g):
 
     # ---------------------------
     # 1) CALCOLI (identici ai tuoi)
@@ -520,7 +520,7 @@ def update_graph(a, b, c, d, e, f, g):
     Input("z-slider", "value"),
     Input("y-slider", "value")
 )
-def update_graph(x,z,y):
+def update_mutuo(x,z,y):
 
     # ---------------------------
     # 1) CALCOLI (identici ai tuoi)
@@ -675,7 +675,7 @@ def update_graph(x,z,y):
                         style={"color": col_ratio_mutuo},
                     ),
                     html.Span(
-                        fmt(ratio_mutuo),
+                        fmt(perc_inter),
                         className="summary-value",
                         style={"color": col_ratio_mutuo},
                     ),
