@@ -667,9 +667,6 @@ def update_graph(x,z,y):
                 className="summary-row",
             ),
         ],
-        className="summary-card"
-    )
-
 
             html.Div(
                 [
@@ -689,6 +686,13 @@ def update_graph(x,z,y):
         ],
         className="summary-card"
     )
+
+        
+        className="summary-card"
+    )
+
+
+
 
 
 
