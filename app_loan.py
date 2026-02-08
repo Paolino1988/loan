@@ -666,8 +666,7 @@ def update_graph(x,z,y):
                 ],
                 className="summary-row",
             ),
-        ],
-
+        
             html.Div(
                 [
                     html.Span(
@@ -687,9 +686,7 @@ def update_graph(x,z,y):
         className="summary-card"
     )
 
-        
-        className="summary-card"
-    )
+
 
 
 
