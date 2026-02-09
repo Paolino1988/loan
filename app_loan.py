@@ -767,11 +767,13 @@ def update_graph(x, z, y):
     return html.Div(
     [
         html.H4(
-            "Andamento percentuale degli interessi nel tempo",
+            "Andamento percentuale degli interessi nel tempo con Ammortamento Francese",
             style={
                 "marginBottom": "10px",
                 "textAlign": "center",
                 "color": "#374151",
+                "fontSize": "22px",  
+                "fontWeight": "600"
             },
         ),
         table,
