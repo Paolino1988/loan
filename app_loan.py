@@ -126,6 +126,7 @@ def ratio_mutuo(X,r,mm):
     list_ratio = []
     X_f = X
     X_i = X
+    c_i = X/M
     for k in range(1,M):
         X_f=(X_f*(1+i)-q_f)
         list_interessi_f.append(X_f*i)
@@ -134,10 +135,10 @@ def ratio_mutuo(X,r,mm):
         X_i = X_i*(1-k/M)
         list_interessi_i.append(X_i*i)
         list_capitale_i.append(X_i)
-        list_ratio.append((X_i*i)*100/(X_i/M+X_i*i))
+        list_ratio.append((X_i*i)*100/(c_i+X_i*i))
 
     
-    return [ (x/q_f)*100 for x in list_interessi_f],  list_ratio[0]
+    return [ (x/q_f)*100 for x in list_interessi_f ],  list_ratio
 
 
 ##--------------------------------------------------
@@ -318,7 +319,11 @@ app.layout = html.Div(
 
         html.Br(),
         
-        html.Div(id="percent-table-container")
+        html.Div(id="percent-table-container_ita"),
+
+        html.Br(),
+        
+        html.Div(id="percent-table-container_fr")
         
     ]
 )
@@ -539,7 +544,7 @@ def update_mutuo(x,z,y):
     q_i_f = list_result[4]
     q_i_m = list_result[5]
 
-    perc_inter = ratio_mutuo(1000*x,z/100,y)[1]
+    
 
     # ---------------------------
     # 2) FORMATTAZIONE NUMERI
@@ -671,25 +676,101 @@ def update_mutuo(x,z,y):
                 ],
                 className="summary-row",
             ),
-        
-            html.Div(
-                [
-                    html.Span(
-                        "Percentuale di interesse su ogni rata per ammortamento Italiano",
-                        className="summary-label",
-                        style={"color": col_ratio_mutuo},
-                    ),
-                    html.Span(
-                        f"{round(perc_inter,2)}%",
-                        className="summary-value",
-                        style={"color": col_ratio_mutuo},
-                    ),
-                ],
-                className="summary-row",
-            ),
         ],
         className="summary-card"
     )
+
+
+
+
+
+@app.callback(
+    Output("percent-table-container_ita", "children"),
+    Input("x-input", "value"),
+    Input("z-input", "value"),
+    Input("y-input", "value")
+)
+def update_table_ita(x, z, y):
+
+    # ---------------------------
+    # 1) CALCOLI
+    # ---------------------------
+    perc_inter = ratio_mutuo(1000*x,z/100,y)[1]
+    months = list(range(1, len(perc_inter) + 1))
+
+    data = [
+        {
+            "Mese": m,
+            "Percentuale di interesse su rata (%)": round(p, 2)
+        }
+        for m, p in zip(months, perc_inter)
+    ]
+
+    table = dash_table.DataTable(
+        data=data,
+        columns=[
+            {"name": "Mese", "id": "Mese"},
+            {"name": "Percentuale di interesse su rata (%)", "id": "Percentuale di interesse su rata (%)"},
+        ],
+        fixed_rows={"headers": True},
+        style_table={
+            "height": "350px",          
+            "overflowY": "auto",       
+            "border": "1px solid #ddd",
+        },
+        style_cell={
+            "textAlign": "center",
+            "padding": "8px",
+            "fontFamily": "Arial",
+            "fontSize": "14px",
+            },
+        style_cell_conditional=[
+            {
+                "if": {"column_id": "mese"},
+                "width": "80px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+            },
+            {
+                "if": {"column_id": "percentuale"},
+                "width": "140px",
+            },
+        ],
+        
+        style_header={
+            "backgroundColor": "#f3f4f6",
+            "fontWeight": "bold",
+            "borderBottom": "2px solid #d1d5db",
+        },
+        style_data_conditional=[
+            {
+                "if": {"row_index": "odd"},
+                "backgroundColor": "#fafafa",
+            }
+        ],
+    )
+
+    return html.Div(
+    [
+        html.H4(
+            "Andamento percentuale degli interessi nel tempo con Ammortamento Italiano",
+            style={
+                "marginBottom": "10px",
+                "textAlign": "center",
+                "color": "#374151",
+                "fontSize": "22px",  
+                "fontWeight": "600"
+            },
+        ),
+        table,
+    ],
+    style={
+        "backgroundColor": "white",
+        "padding": "12px",
+        "borderRadius": "10px",
+        "boxShadow": "0 4px 12px rgba(0,0,0,0.05)",
+    },
+)
 
 
 
@@ -699,12 +780,12 @@ def update_mutuo(x,z,y):
 
 
 @app.callback(
-    Output("percent-table-container", "children"),
+    Output("percent-table-container_fr", "children"),
     Input("x-input", "value"),
     Input("z-input", "value"),
     Input("y-input", "value")
 )
-def update_graph(x, z, y):
+def update_table_f(x, z, y):
 
     # ---------------------------
     # 1) CALCOLI
