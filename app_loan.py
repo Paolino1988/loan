@@ -701,7 +701,7 @@ def update_table_ita(x, z, y):
     data = [
         {
             "Mese": m,
-            "Percentuale di interesse su rata (%)": round(p, 2)
+            "Percentuale di interesse su rata (%)": round(p, 4)
         }
         for m, p in zip(months, perc_inter)
     ]
@@ -796,7 +796,7 @@ def update_table_f(x, z, y):
     data = [
         {
             "Mese": m,
-            "Percentuale di interesse su rata (%)": round(p, 2)
+            "Percentuale di interesse su rata (%)": round(p, 4)
         }
         for m, p in zip(months, list_perc)
     ]
