@@ -703,26 +703,20 @@ def update_mutuo(x,z,y):
     Input("z-input", "value"),
     Input("y-input", "value")
 )
-def update_graph(x,z,y):
+def update_graph(x, z, y):
 
     # ---------------------------
-    # 1) CALCOLI (identici ai tuoi)
+    # 1) CALCOLI
     # ---------------------------
-    list_perc  = ratio_mutuo(1000*x,z/100,y)[0]
+    list_perc = ratio_mutuo(1000 * x, z / 100, y)[0]
     months = list(range(1, len(list_perc) + 1))
-
-    def percent_plot_from_list(list_perc):
-        months = list(range(1, len(list_perc) + 1))
 
     fig = go.Figure()
 
     fig.add_trace(
-        go.Scatter(
+        go.Bar(
             x=months,
             y=list_perc,
-            mode="lines+markers",
-            line=dict(width=3),
-            marker=dict(size=6),
             hovertemplate="Mese %{x}<br>%{y:.2f}%<extra></extra>",
             name="Percentuale"
         )
