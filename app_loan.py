@@ -728,7 +728,7 @@ def update_graph(x,z,y):
     )
 
     fig.update_layout(
-        title="Andamento percentuale nel tempo",
+        title="Andamento percentuale nel tempo degli Interessi rispetto la Rata",
         xaxis_title="Mesi",
         yaxis_title="Percentuale",
         yaxis_ticksuffix="%",
