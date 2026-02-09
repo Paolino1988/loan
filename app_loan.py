@@ -679,7 +679,7 @@ def update_mutuo(x,z,y):
                         style={"color": col_ratio_mutuo},
                     ),
                     html.Span(
-                        fmt(perc_inter),
+                        f"{perc_inter}%",
                         className="summary-value",
                         style={"color": col_ratio_mutuo},
                     ),
