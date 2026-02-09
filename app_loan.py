@@ -132,7 +132,7 @@ def ratio_mutuo(X,r,mm):
         list_interessi_f.append(X_f*i)
         list_capitale_f.append(q_f-X_f*i)
 
-        X_i = X_i*(1-k/M)
+        X_i = X*(1-k/M)
         list_interessi_i.append(X_i*i)
         list_capitale_i.append(X_i)
         list_ratio.append((X_i*i)*100/(c_i+X_i*i))
