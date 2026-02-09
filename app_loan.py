@@ -737,20 +737,20 @@ def update_graph(x, z, y):
             "padding": "8px",
             "fontFamily": "Arial",
             "fontSize": "14px",
-
+            },
         style_cell_conditional=[
-        {
-            "if": {"column_id": "mese"},
-            "width": "80px",
-            "maxWidth": "80px",
-            "minWidth": "80px",
-        },
-        {
-            "if": {"column_id": "percentuale"},
-            "width": "140px",
-        },
+            {
+                "if": {"column_id": "mese"},
+                "width": "80px",
+                "maxWidth": "80px",
+                "minWidth": "80px",
+            },
+            {
+                "if": {"column_id": "percentuale"},
+                "width": "140px",
+            },
         ],
-        },
+        
         style_header={
             "backgroundColor": "#f3f4f6",
             "fontWeight": "bold",
