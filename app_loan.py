@@ -715,7 +715,7 @@ def update_graph(x, z, y):
     data = [
         {
             "Mese": m,
-            "Percentuale (%)": round(p, 2)
+            "Percentuale di interesse su rata (%)": round(p, 2)
         }
         for m, p in zip(months, list_perc)
     ]
@@ -737,6 +737,19 @@ def update_graph(x, z, y):
             "padding": "8px",
             "fontFamily": "Arial",
             "fontSize": "14px",
+
+        style_cell_conditional=[
+        {
+            "if": {"column_id": "mese"},
+            "width": "80px",
+            "maxWidth": "80px",
+            "minWidth": "80px",
+        },
+        {
+            "if": {"column_id": "percentuale"},
+            "width": "140px",
+        },
+        ],
         },
         style_header={
             "backgroundColor": "#f3f4f6",
@@ -751,7 +764,26 @@ def update_graph(x, z, y):
         ],
     )
 
-    return table
+    return html.Div(
+    [
+        html.H4(
+            "Andamento percentuale degli interessi nel tempo",
+            style={
+                "marginBottom": "10px",
+                "textAlign": "center",
+                "color": "#374151",
+            },
+        ),
+        table,
+    ],
+    style={
+        "backgroundColor": "white",
+        "padding": "12px",
+        "borderRadius": "10px",
+        "boxShadow": "0 4px 12px rgba(0,0,0,0.05)",
+    },
+)
+
 
 
     
