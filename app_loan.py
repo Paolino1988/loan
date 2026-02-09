@@ -284,7 +284,8 @@ app.layout = html.Div(
             type="number",
             value=100,
             min=50,
-            step=1
+            step=1,
+            style={"marginBottom": "20px"}
         ),
         
         html.Br(),
@@ -576,7 +577,7 @@ def update_mutuo(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Rata con Ammortamento Francese per numero mesi f{y}",
+                        f"Rata con Ammortamento Francese per numero mesi {y*12}",
                         className="summary-label",
                         style={"color": color_rata_fr},
                     ),
@@ -624,7 +625,7 @@ def update_mutuo(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        f"Prima rata con Ammortamento Italiano (rata massima) per numero mesi f{y}",
+                        f"Prima rata con Ammortamento Italiano (rata massima) per numero mesi {y*12}",
                         className="summary-label",
                         style={"color": color_rata_it_0},
                     ),
@@ -673,7 +674,7 @@ def update_mutuo(x,z,y):
             html.Div(
                 [
                     html.Span(
-                        "Percentuale di interesse pagata su ogni rata",
+                        "Percentuale di interesse su ogni rata per ammortamento Italiano",
                         className="summary-label",
                         style={"color": col_ratio_mutuo},
                     ),
