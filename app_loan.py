@@ -1,6 +1,7 @@
 import numpy as np
 import dash
 from dash import Dash, dash_table, dcc, html
+from dash import dash_table
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import os
@@ -317,7 +318,7 @@ app.layout = html.Div(
 
         html.Br(),
         
-        dcc.Graph(id="percent-graph")
+        html.Div(id="percent-table-container")
         
     ]
 )
@@ -698,7 +699,7 @@ def update_mutuo(x,z,y):
 
 
 @app.callback(
-    Output("percent-graph", "figure"),
+    Output("percent-table-container", "children"),
     Input("x-input", "value"),
     Input("z-input", "value"),
     Input("y-input", "value")
@@ -711,28 +712,47 @@ def update_graph(x, z, y):
     list_perc = ratio_mutuo(1000 * x, z / 100, y)[0]
     months = list(range(1, len(list_perc) + 1))
 
-    fig = go.Figure()
+    data = [
+        {
+            "Mese": m,
+            "Percentuale (%)": round(p, 2)
+        }
+        for m, p in zip(months, list_perc)
+    ]
 
-    fig.add_trace(
-        go.Bar(
-            x=months,
-            y=list_perc,
-            hovertemplate="Mese %{x}<br>%{y:.2f}%<extra></extra>",
-            name="Percentuale"
-        )
+    table = dash_table.DataTable(
+        data=data,
+        columns=[
+            {"name": "Mese", "id": "Mese"},
+            {"name": "Percentuale di interesse su rata (%)", "id": "Percentuale di interesse su rata (%)"},
+        ],
+        fixed_rows={"headers": True},
+        style_table={
+            "height": "350px",          
+            "overflowY": "auto",       
+            "border": "1px solid #ddd",
+        },
+        style_cell={
+            "textAlign": "center",
+            "padding": "8px",
+            "fontFamily": "Arial",
+            "fontSize": "14px",
+        },
+        style_header={
+            "backgroundColor": "#f3f4f6",
+            "fontWeight": "bold",
+            "borderBottom": "2px solid #d1d5db",
+        },
+        style_data_conditional=[
+            {
+                "if": {"row_index": "odd"},
+                "backgroundColor": "#fafafa",
+            }
+        ],
     )
 
-    fig.update_layout(
-        title="Andamento percentuale nel tempo degli Interessi rispetto la Rata",
-        xaxis_title="Mesi",
-        yaxis_title="Percentuale",
-        yaxis_ticksuffix="%",
-        template="plotly_white",
-        height=400,
-        margin=dict(l=40, r=40, t=60, b=40)
-    )
+    return table
 
-    return fig
 
     
 
